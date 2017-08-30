@@ -1,5 +1,6 @@
 # coding=utf-8
 
+from __future__ import print_function
 import pandas as pd
 import numpy as np
 import datetime, time
@@ -34,7 +35,7 @@ def load_airport_city():
     fl.write(json.dumps(airport_city))
     fl.close()
     '''
-    print '------>Load Airport City Dict Success!'
+    print('------>Load Airport City Dict Success!')
     return airport_city
 
 
@@ -73,7 +74,7 @@ def load_weather():
 
     # 添加天气向量    
     df['weatherVec'] = df['天气'].apply(lambda x: list(model[unicode(x, "utf-8")]))
-    print df.head()
+    print(df.head())
     df.to_csv('../Data/train/output/weather_airport_vec.csv', index=False)
 
 
@@ -85,7 +86,8 @@ def string2timestamp(strValue):
         timeStamp = float(str(timeStamp) + str("%06d" % d.microsecond)) / 1000000
         return timeStamp
     except ValueError as e:
-        print e
+        print
+        e
 
 
 def load_special_news():
@@ -110,7 +112,7 @@ def load_data():
     weather_from['weatherVecFrom'] = weather_from['weatherVecFrom'].apply(
         lambda x: [float(i) for i in x[1:-1].split(', ')])
     weather_from['weatherVecFrom'] = weather_from['weatherVecFrom'].apply(lambda x: np.matrix([x]))
-    print weather_from['weatherVecFrom'][0]
+    print(weather_from['weatherVecFrom'][0])
     # 到达机场天气
     weather_to = pd.read_csv('../Data/train/output/weather_airport_vec.csv')
     weather_to.columns = [u'到达机场', u'到达机场天气', u'到达机场最低气温', u'到达机场最高气温', 'date', 'weatherVecTo']
@@ -147,7 +149,7 @@ def load_data():
     for index, row in sn.iterrows():
         # print data.ix[0,u'计划起飞时间'] - row[u'结束时间']
         data[((data[u'出发机场'] == row[u'特情机场']) | (data[u'到达机场'] == row[u'特情机场'])) & (
-        (data[u'计划起飞时间'] > row[u'开始时间']) & (data[u'计划起飞时间'] < row[u'结束时间']))]['hasSpecialNews'] = 1
+            (data[u'计划起飞时间'] > row[u'开始时间']) & (data[u'计划起飞时间'] < row[u'结束时间']))]['hasSpecialNews'] = 1
         # break
 
     # 缺失值
@@ -159,7 +161,7 @@ def load_data():
 
 
 def pretreat(df):
-    print '----------------------'
+    print('----------------------')
 
     # 缺失值
     df = df.dropna()
@@ -253,7 +255,7 @@ def pretreat(df):
     # 连接正样本与负样本
     data = pd.concat([result_n, result_p])
 
-    print '------->load...'
+    print('------->load...')
     return data
 
 
@@ -278,7 +280,7 @@ def train_model(trainX, trainY):
 def evaluate(real_v, predict_v):
     # 得出评价指标
     AUC = metrics.roc_auc_score(real_v, predict_v)
-    print "AUC: %f" % AUC
+    print("AUC: %f" % AUC)
 
     threshold = 0.5
     for i in range(0, len(predict_v)):
@@ -300,11 +302,12 @@ def evaluate(real_v, predict_v):
     recall = float(tp) / (tp + fn)
     pre = float(tp) / (tp + fp)
 
-    print "ACC: ", acc
-    print "Pre: ", pre
-    print "Recall: ", recall
+    print("ACC: ", acc)
+    print("Pre: ", pre)
+    print("Recall: ", recall)
 
-    print confusion_matrix
+    print
+    confusion_matrix
     return [AUC, acc, pre, recall]
 
     '''
@@ -327,7 +330,7 @@ def log(p, record):
 
 def model_cmd():
     res_path = "res_0-22.txt"
-    print "==> Modeling start "
+    print("==> Modeling start ")
     log_file = open(res_path, 'w')
     log_file.write("--> start\n")
     log_file.close()
@@ -342,7 +345,7 @@ def model_cmd():
     print('负样本数量: %d' % count_data_n)
     log(res_path, "==> get positive samples: " + str(NUM - count_data_n))
     log(res_path, "==> get negative samples: " + str(count_data_n))
-    print "总数据： ", NUM
+    print("总数据： ", NUM)
 
     skf = KFold(NUM, n_folds=10, shuffle=True)
     count = 0
@@ -351,12 +354,12 @@ def model_cmd():
     pre_set = []
     recall_set = []
     f1_set = []
-    print "---------  Modeling ------------"
+    print("---------  Modeling ------------")
     log(res_path, "---------  Modeling ------------")
-    print "--------------------------------"
+    print("--------------------------------")
     log(res_path, "--------------------------------")
     for train, test in skf:
-        print "--> fold: ", count
+        print("--> fold: ", count)
         log(res_path, "Fold: " + str(count))
 
         Feature = [
@@ -405,7 +408,7 @@ def model_cmd():
         # 训练集AUC
         y_predprob = m.predict(train_x)
         train_auc = metrics.roc_auc_score(train_y, y_predprob)
-        print "AUC Score (train): %f" % train_auc
+        print("AUC Score (train): %f" % train_auc)
         log(res_path, "| AUC (Train):\t" + str(train_auc))
 
         # 模型测试
@@ -418,34 +421,34 @@ def model_cmd():
 
         f1 = 2 * pre * recall / (pre + recall)
         f1_set.append(f1)
-        print "F1: ", f1
+        print("F1: ", f1)
         log(res_path, "| AUC Score (test):\t" + str(AUC))
         log(res_path,
             "| Accuracy: " + str(acc) + " | Precision: " + str(pre) + " | Recall: " + str(recall) + " | F1: " + str(f1))
         count += 1
-        print "--------------------------------"
+        print("--------------------------------")
         log(res_path, "--------------------------------")
 
     mean_auc = sum(AUC_set) / len(AUC_set)
-    print "Mean AUC: ", mean_auc
+    print("Mean AUC: ", mean_auc)
     log(res_path, "Mean AUC: " + str(mean_auc))
     mean_acc = sum(acc_set) / len(acc_set)
-    print "Mean acc: ", mean_acc
+    print("Mean acc: ", mean_acc)
     log(res_path, "Mean acc: " + str(mean_acc))
     mean_pre = sum(pre_set) / len(pre_set)
-    print "Mean pre: ", mean_pre
+    print("Mean pre: ", mean_pre)
     log(res_path, "Mean pre: " + str(mean_pre))
     mean_recall = sum(recall_set) / len(recall_set)
-    print "Mean recall: ", mean_recall
+    print("Mean recall: ", mean_recall)
     log(res_path, "Mean recall: " + str(mean_recall))
     mean_f1 = sum(f1_set) / len(f1_set)
-    print "Mean F1: ", mean_f1
+    print("Mean F1: ", mean_f1)
     log(res_path, "Mean F1: " + str(mean_f1))
-    print "over!"
+    print("over!")
 
 
 if __name__ == '__main__':
     # model_cmd()
     # load_special_news()
-    # data = load_data()
-    load_weather()
+    data = load_data()
+    # load_weather()
