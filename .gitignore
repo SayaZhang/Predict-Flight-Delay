@@ -1,0 +1,15 @@
+# Created by .ignore support plugin (hsz.mobi)
+
+# IntelliJ project files
+.idea
+*.iml
+out
+gen
+
+# Office 缓存文件
+**/~'$'*.docx
+**/~'$'*.doc
+**/~'$'*.ppt
+**/~'$'*.pptx
+**/~'$'*.xls
+**/~'$'*.xlsx
