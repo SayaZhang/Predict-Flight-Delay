@@ -1,6 +1,60 @@
 --> start
-==> get positive samples: 250
+==> get positive samples: 252
 ==> get negative samples: 123
 ---------  Modeling ------------
 --------------------------------
 Fold: 0
+| AUC (Train):	0.995575221239
+| AUC Score (test):	1.0
+| Accuracy: 1.0 | Precision: 1.0 | Recall: 1.0 | F1: 1.0
+--------------------------------
+Fold: 1
+| AUC (Train):	0.995594713656
+| AUC Score (test):	1.0
+| Accuracy: 1.0 | Precision: 1.0 | Recall: 1.0 | F1: 1.0
+--------------------------------
+Fold: 2
+| AUC (Train):	0.995614035088
+| AUC Score (test):	1.0
+| Accuracy: 1.0 | Precision: 1.0 | Recall: 1.0 | F1: 1.0
+--------------------------------
+Fold: 3
+| AUC (Train):	0.995535714286
+| AUC Score (test):	1.0
+| Accuracy: 1.0 | Precision: 1.0 | Recall: 1.0 | F1: 1.0
+--------------------------------
+Fold: 4
+| AUC (Train):	0.995515695067
+| AUC Score (test):	1.0
+| Accuracy: 1.0 | Precision: 1.0 | Recall: 1.0 | F1: 1.0
+--------------------------------
+Fold: 5
+| AUC (Train):	0.995633187773
+| AUC Score (test):	1.0
+| Accuracy: 1.0 | Precision: 1.0 | Recall: 1.0 | F1: 1.0
+--------------------------------
+Fold: 6
+| AUC (Train):	0.995633187773
+| AUC Score (test):	1.0
+| Accuracy: 1.0 | Precision: 1.0 | Recall: 1.0 | F1: 1.0
+--------------------------------
+Fold: 7
+| AUC (Train):	0.997816593886
+| AUC Score (test):	0.978260869565
+| Accuracy: 0.972972972973 | Precision: 1.0 | Recall: 0.95652173913 | F1: 0.977777777778
+--------------------------------
+Fold: 8
+| AUC (Train):	0.997777777778
+| AUC Score (test):	0.981481481481
+| Accuracy: 0.972972972973 | Precision: 1.0 | Recall: 0.962962962963 | F1: 0.981132075472
+--------------------------------
+Fold: 9
+| AUC (Train):	0.995614035088
+| AUC Score (test):	1.0
+| Accuracy: 1.0 | Precision: 1.0 | Recall: 1.0 | F1: 1.0
+--------------------------------
+Mean AUC: 0.995974235105
+Mean acc: 0.994594594595
+Mean pre: 1.0
+Mean recall: 0.991948470209
+Mean F1: 0.995890985325
