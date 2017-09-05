@@ -173,8 +173,8 @@ def load_data():
     print('Extract special news feature success')
 
     # 缺失值 
-    data = data.dropna()
-    
+    df = df.dropna()
+
     # print data[data['hasSpecialNews'] == True]
     # print data[data['timePrepareThisFlightPlan'] != 0].head()
     print('Load data with feature success')
@@ -288,13 +288,13 @@ def balanceSample(result):
     # 连接正样本与负样本
     data = pd.concat([result_n, result_p])
 
-    # print('------->Balance sample success')
+    print('------->Balance sample success')
     return data
 
 
 def load_data_with_feature():
     # 获取数据
-    reader = pd.read_csv('../Feature/data_with_last_flight_feature.csv', iterator=True, encoding="gbk")
+    reader = pd.read_csv('../Featrue/data_with_last_flight_feature.csv', iterator=True, encoding="gbk")
     loop = True
     chunkSize = 100000
     chunks = []
@@ -349,18 +349,14 @@ def load_data_with_feature():
     print('Extract special news feature success')
 
     # 缺失值 
-    data = data.dropna()
-    data.to_csv('../Feature/sample_data_with_all_feature.csv',index=False,encoding='gbk')
+    df = df.dropna()
+
     # print data[data['hasSpecialNews'] == True]
     # print data[data['timePrepareThisFlightPlan'] != 0].head()
     print('Load data with all feature success')
     
     
     return data
-
-def load_sample_data_with_feature():
-    df = pd.read_csv('../Feature/sample_data_with_feature.csv',encoding='gbk')
-    return df
 
 def train_model(trainX, trainY):
     # 训练分类模型
@@ -439,7 +435,8 @@ def model_cmd():
     log_file.close()
 
     # 获取正负样本数据
-    data = load_sample_data_with_feature()
+
+    data = load_data_with_feature()
 
     NUM = len(data)
     count_data_n = len(data[data['isMoreThan3'] == 1])
