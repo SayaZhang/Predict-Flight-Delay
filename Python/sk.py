@@ -117,7 +117,7 @@ def load_test_weather():
 
     # 语料写入文件
 
-    fsock = open("../Data/test A/output/weather_word.txt", "a")
+    fsock = open("../Data/test A/output/weather_word.txt", "w")
     fsock.write(words.encode('utf-8'))
     fsock.close()
 
@@ -263,10 +263,12 @@ def load_test_data():
     df = extractBasicFeature(df)
     df = extractFlightFeature(df)        
     df = extractLastFlightFeature(df)
-    
+    df = extractNeedSubmitData(df)
+
     df.to_csv('../Data/test A/output/data_feature.csv',index=False,encoding='gbk')
     '''
     df = pd.read_csv('../Data/test A/output/data_feature.csv', encoding="gbk")
+    print (df.shape)
     load_test_weather()
 
     # 出发机场天气
@@ -293,7 +295,9 @@ def load_test_data():
 
     # 添加天气特征
     data_from = pd.merge(df, weather_from, on=[u'出发机场', 'date'], how='inner')
+    print (data_from.shape)
     data = pd.merge(data_from, weather_to, on=[u'到达机场', 'date'], how='inner')
+    print(data.shape)
     print('Extract weather feature success')
 
     # 添加特情
@@ -306,7 +310,7 @@ def load_test_data():
     print('Extract special news feature success')
 
     # 缺失值 
-    data = data.dropna()
+    # data = data.dropna()
 
     # print data[data['hasSpecialNews'] == True]
     # print data[data['timePrepareThisFlightPlan'] != 0].head()
@@ -314,9 +318,57 @@ def load_test_data():
     return data
 
 
-def extractBasicFeature(df):
+def extractAvgDelay():
+    # 获取数据
+    reader = pd.read_csv('../Data/train/flight_information.csv', encoding="gbk")
     # 缺失值
-    df = df.dropna()
+    df = reader.dropna()
+
+    dict = {}
+    for flight in df.groupby([u'出发机场']):
+        # 机场编号
+        key = flight[0]
+        values = flight[1]
+
+        # 该机场平均延误时间
+        avg_delay_time = (values[u'实际起飞时间'] - values[u'计划起飞时间']).mean()
+        dict[key] = avg_delay_time
+
+    data = pd.DataFrame(list(dict.items()), columns=[u'出发机场', 'avg_delay_time'])
+    data.to_csv('../Data/train/output/flight_avg_delay_time.csv', index=False, encoding='gbk')
+    print(data)
+    print("==> extract avg delay time success.")
+
+
+def extractBasicFeature(df):
+    # 加载平均延迟
+    avg_delay = pd.read_csv('../Data/train/output/flight_avg_delay_time.csv', encoding='gbk')
+
+    # 所有机场的平均延时
+    avg_mean = avg_delay['avg_delay_time'].mean()
+
+    # 构造字典
+    dict = {}
+    dict['avg_mean'] = avg_mean
+    for index, values in avg_delay.iterrows():
+        dict[values[u'出发机场']] = values['avg_delay_time']
+
+    print("==>load flight_avg_delay_time.csv success.")
+
+    # 填补
+
+    for index, values in df.iterrows():
+        curr_key = values[u'出发机场']
+        if (pd.isnull(values[u'实际起飞时间'])):
+            if (dict.has_key(curr_key)):
+                df.ix[index, [u'实际起飞时间']] = values[u'计划起飞时间'] + int(dict[curr_key])
+                df.ix[index, [u'实际到达时间']] = values[u'计划到达时间'] + int(dict[curr_key])
+            else:
+                df.ix[index, [u'实际起飞时间']] = values[u'计划起飞时间'] + int(dict['avg_mean'])
+                df.ix[index, [u'实际到达时间']] = values[u'计划到达时间'] + int(dict['avg_mean'])
+
+        if (pd.isnull(values[u'航班是否取消'])):
+            df.ix[index, [u'航班是否取消']] = u'否'
 
     # 延误时间
     df['delay'] = df[u'实际起飞时间'] - df[u'计划起飞时间']
@@ -340,9 +392,10 @@ def extractBasicFeature(df):
 def extractFlightFeature(df):
     # 添加本航班特征
     flight_feature = []
+
     for flight in df.groupby([u'航班编号', u'出发机场']):
 
-        print(flight[0], ' Extract flight feature success')
+        # print(flight[0], ' Extract flight feature success')
 
         describe = flight[1]['delay'].describe()
         if len(flight[1]) > 1:
@@ -352,16 +405,28 @@ def extractFlightFeature(df):
             flight_feature.append([flight[0][0], flight[0][1], describe['mean'], 0, describe['max'], describe['50%']])
     df_flight_feature = pd.DataFrame(flight_feature,
                                      columns=[u'航班编号', u'出发机场', u'平均延误时间', u'延误时间标准差', u'最大延误时间', u'延误时间中位数'])
-    df = pd.merge(df, df_flight_feature, on=[u'航班编号', u'出发机场'], how='inner')
+    df = pd.merge(df, df_flight_feature, on=[u'航班编号', u'出发机场'], how='left')
     return df
 
 
 def extractLastFlightFeature(df):
     # 添加前序航班特征
     dfg_all = []
+
+    # 对于有缺失值的列填充
+    df_na = df[df[u'飞机编号'].isnull()]
+    df_na['lastFlight'] = ''
+    df_na['timeLastFlightDelay'] = 0
+    df_na['timePrepareThisFlightRemain'] = 0
+    df_na['timePrepareThisFlightPlan'] = 0
+    dfg_all.append(df_na)
+
+    # 去掉缺失值
+    df = df.dropna()
+
     for flight in df.groupby([u'飞机编号', u'date']):
 
-        print(flight[0], ' Extract last flight feature success')
+        # print(flight[0], ' Extract last flight feature success')
 
         dfg = flight[1].sort_values(u'计划起飞时间')
         # dfg['lastFlight'] = 0
@@ -400,6 +465,12 @@ def extractLastFlightFeature(df):
 
     result = pd.concat(dfg_all, ignore_index=True)
     return result
+
+
+def extractNeedSubmitData(df):
+    print("==> extract data which we should submit.")
+    df = df[df[u'需验证标识（1为需提交结果、0不需要提交）'].isin(['1'])]
+    return df
 
 
 def balanceSample(result):
@@ -716,10 +787,12 @@ def model_cmd():
 
 
 if __name__ == '__main__':
-    # load_test_data()
-
-    model_cmd()
+    data = load_test_data()
+    print (data.shape)
+    # extractAvgDelay()
+    # model_cmd()
     # load_special_news()
     # load_data()
     # data = load_data()
     # load_weather()
+
