@@ -268,7 +268,6 @@ def load_test_data():
     df.to_csv('../Data/test A/output/data_feature.csv',index=False,encoding='gbk')
     '''
     df = pd.read_csv('../Data/test A/output/data_feature.csv', encoding="gbk")
-    print (df.shape)
     load_test_weather()
 
     # 出发机场天气
@@ -295,9 +294,7 @@ def load_test_data():
 
     # 添加天气特征
     data_from = pd.merge(df, weather_from, on=[u'出发机场', 'date'], how='inner')
-    print (data_from.shape)
     data = pd.merge(data_from, weather_to, on=[u'到达机场', 'date'], how='inner')
-    print(data.shape)
     print('Extract weather feature success')
 
     # 添加特情
@@ -310,7 +307,7 @@ def load_test_data():
     print('Extract special news feature success')
 
     # 缺失值 
-    # data = data.dropna()
+    data = data.dropna()
 
     # print data[data['hasSpecialNews'] == True]
     # print data[data['timePrepareThisFlightPlan'] != 0].head()
@@ -471,6 +468,19 @@ def extractNeedSubmitData(df):
     print("==> extract data which we should submit.")
     df = df[df[u'需验证标识（1为需提交结果、0不需要提交）'].isin(['1'])]
     return df
+
+
+def build_submission_result(predict_X, predict_Y):
+    print("==>prepare for submission.")
+    submission = pd.DataFrame(columns=[])
+    submission.loc[:, 'Flightno'] = predict_X.loc[:, u'航班编号']
+    submission.loc[:, 'FlightDepcode'] = predict_X.loc[:, u'出发机场']
+    submission.loc[:, 'FlightArrcode'] = predict_X.loc[:, u'到达机场']
+    submission.loc[:, 'PlannedDeptime'] = predict_X.loc[:, u'计划起飞时间'].astype('int')
+    submission.loc[:, 'PlannedArrtime'] = predict_X.loc[:, u'计划到达时间'].astype('int')
+    submission.loc[:, 'prob'] = predict_Y.loc[:, 'prob']
+    print("==>build submission result finished.")
+    return submission
 
 
 def balanceSample(result):
@@ -697,7 +707,7 @@ def model_cmd():
     pre_set = []
     recall_set = []
     f1_set = []
-    total_probability = []
+    total_probability = pd.DataFrame(columns=[])
     print("---------  Modeling ------------")
     log(res_path, "---------  Modeling ------------")
     print("--------------------------------")
@@ -752,15 +762,17 @@ def model_cmd():
 
         test_data = load_test_data()
         p = m.predict(test_data.ix[:, Feature]).transpose()
-        predictDf = pd.DataFrame(p, columns=['probability'])
+        predictDf = pd.DataFrame(p, columns=['prob'])
         if (count == 1):
             total_probability = predictDf
         else:
-            total_probability['probability'] += predictDf['probability']
+            total_probability['prob'] += predictDf['prob']
             # print(predictDf.head())
             # log(res_path, str(p))
         print(total_probability.head())
-    total_probability['probability'] /= NUM
+
+    total_probability['prob'] /= 10
+    total_probability = build_submission_result(test_data, total_probability)
     total_probability.to_csv("../Data/test A/output/predict.csv", index=False)
     print("------------Finished-----------------")
     log(res_path, "------------Finished-----------------")
@@ -787,12 +799,11 @@ def model_cmd():
 
 
 if __name__ == '__main__':
-    data = load_test_data()
-    print (data.shape)
+    # data = load_test_data()
+    # print (data.shape)
     # extractAvgDelay()
-    # model_cmd()
+    model_cmd()
     # load_special_news()
     # load_data()
     # data = load_data()
     # load_weather()
-
