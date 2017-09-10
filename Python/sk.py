@@ -93,7 +93,7 @@ def log(p, record):
     log_file.close()
 
 
-def model_cmd():
+def model_cmd(op=0):
     
     global m
     res_path = "res_0-22.txt"
@@ -113,6 +113,7 @@ def model_cmd():
     log(res_path, "==> get negative samples: " + str(count_data_n))
     print("总数据： ", NUM)
 
+    # 基础特征
     Feature = [
         # 航班基本信息
         # u'航班编号',
@@ -127,27 +128,65 @@ def model_cmd():
         u'最大延误时间',
         u'延误时间中位数',
 
-        # 前序航班
-        # u'lastFlight',
-        u'timeLastFlightDelay',
-        u'timePrepareThisFlightRemain',
-        u'timePrepareThisFlightPlan',
-
-        # 天气
-        u'出发机场最低气温',
-        u'出发机场最高气温',
-        u'weatherVecFrom0',
-        u'weatherVecFrom1',
-        u'weatherVecFrom2',
-        u'到达机场最低气温',
-        u'到达机场最高气温',
-        u'weatherVecTo0',
-        u'weatherVecTo1',
-        u'weatherVecTo2',
-
         # 特情
         u'hasSpecialNews'
     ]
+    
+    test_data = flight.load_test_data('../Data/test A/output/no_lastflight_no_weather.csv',
+                                              'no_lastflight_no_weather')
+    
+    # 基础特征 + 前序航班 
+    if op == 1:
+        Feature.extend([                    
+            # u'lastFlight',
+            u'timeLastFlightDelay',
+            u'timePrepareThisFlightRemain',
+            u'timePrepareThisFlightPlan'
+        ])
+        
+        test_data = flight.load_test_data('../Data/test A/output/has_lastflight_no_weather.csv',
+                                               'has_lastflight_no_weather')
+    
+    # 基础特征 + 天气
+    if op == 2:
+        Feature.extend([                    
+            u'出发机场最低气温',
+            u'出发机场最高气温',
+            u'weatherVecFrom0',
+            u'weatherVecFrom1',
+            u'weatherVecFrom2',
+            u'到达机场最低气温',
+            u'到达机场最高气温',
+            u'weatherVecTo0',
+            u'weatherVecTo1',
+            u'weatherVecTo2'
+        ])
+        
+        test_data = flight.load_test_data('../Data/test A/output/no_lastflight_has_weather.csv',
+                                               'no_lastflight_has_weather')
+        
+    # 基础特征 + 前序航班 + 天气
+    if op == 3:
+        Feature.extend([ 
+            # u'lastFlight',
+            u'timeLastFlightDelay',
+            u'timePrepareThisFlightRemain',
+            u'timePrepareThisFlightPlan',                   
+            u'出发机场最低气温',
+            u'出发机场最高气温',
+            u'weatherVecFrom0',
+            u'weatherVecFrom1',
+            u'weatherVecFrom2',
+            u'到达机场最低气温',
+            u'到达机场最高气温',
+            u'weatherVecTo0',
+            u'weatherVecTo1',
+            u'weatherVecTo2'
+        ])
+        
+        test_data = flight.load_test_data('../Data/test A/output/has_lastflight_has_weather.csv',
+                                                'has_lastflight_has_weather')
+        
     Label = ['isMoreThan3']
 
     skf = KFold(NUM, n_folds=10, shuffle=True)
@@ -174,17 +213,17 @@ def model_cmd():
         test_y = data.ix[test, Label]
         m = []
 
-        if (os.path.isfile('../Model/m' + str(count) + '.model')):
+        if (os.path.isfile('../Model/' + str(op) + 'm' + str(count) + '.model')):
             # 模型加载
-            m = joblib.load('../Model/m' + str(count) + '.model')
-            print('==> m' + str(count) + '.model had been trained.')
-            log(res_path, '==> m' + str(count) + '.model had been trained.')
+            m = joblib.load('../Model/' + str(op) + 'm' + str(count) + '.model')
+            print('==> ' + str(op) + 'm' + str(count) + '.model had been trained.')
+            log(res_path, '==> ' + str(op) + 'm' + str(count) + '.model had been trained.')
         else:
             # 模型训练
             m = train_model(train_x, train_y)
-            print('==> m' + str(count) + '.model has been training.')
-            log(res_path, '==> m' + str(count) + '.model has been training.')
-            joblib.dump(m, '../Model/m' + str(count) + '.model')
+            print('==> ' + str(op) + 'm' + str(count) + '.model has been training.')
+            log(res_path, '==> ' + str(op) + 'm' + str(count) + '.model has been training.')
+            joblib.dump(m, '../Model/' + str(op) + 'm' + str(count) + '.model')
 
         # 训练集AUC
         y_predprob = m.predict(train_x)
@@ -210,7 +249,7 @@ def model_cmd():
         print("--------------------------------")
         log(res_path, "--------------------------------")
 
-        test_data = flight.load_test_data()
+        #test_data = flight.load_test_data()
         p = m.predict(test_data.ix[:, Feature]).transpose()
         predictDf = pd.DataFrame(p, columns=['prob'])
         if (count == 1):
@@ -223,7 +262,7 @@ def model_cmd():
 
     total_probability['prob'] /= 10
     total_probability = flight.build_submission_result(test_data, total_probability)
-    total_probability.to_csv("../Data/test A/output/predict.csv", index=False)
+    total_probability.to_csv("../Data/test A/output/predict" + str(op) + ".csv", index=False)
     
     print("------------Finished-----------------")
     log(res_path, "------------Finished-----------------")
@@ -250,11 +289,12 @@ def model_cmd():
 
 
 if __name__ == '__main__':
-    # data = load_test_data()
-    # print (data.shape)
-    # extractAvgDelay()
-    model_cmd()
-    # load_special_news()
-    # load_data()
-    # data = load_data()
-    # load_weather()
+    
+    # model_cmd()
+    
+    # model_cmd(1)
+    
+    # model_cmd(2)
+    
+    # model_cmd(3)
+    flight.concat_predict_data()

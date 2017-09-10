@@ -654,18 +654,14 @@ def load_sample_data_with_feature():
     df = pd.read_csv('../Feature/sample_data_with_feature.csv', encoding='gbk')
     return df
 
-
-if __name__ == '__main__':
-    classify_test_data()
-    no_lastflight_no_weather = load_test_data('../Data/test A/output/no_lastflight_no_weather.csv',
-                                              'no_lastflight_no_weather')
-    print(no_lastflight_no_weather.shape)
-    no_lastflight_has_weather = load_test_data('../Data/test A/output/no_lastflight_has_weather.csv',
-                                               'no_lastflight_has_weather')
-    print(no_lastflight_has_weather.shape)
-    has_lastflight_no_weather = load_test_data('../Data/test A/output/has_lastflight_no_weather.csv',
-                                               'has_lastflight_no_weather')
-    print(has_lastflight_no_weather.shape)
-    has_lastflight_has_weather = load_test_data('../Data/test A/output/has_lastflight_has_weather.csv',
-                                                'has_lastflight_has_weather')
-    print(has_lastflight_has_weather.shape)
+def concat_predict_data():
+    df = pd.read_csv('../Data/test A/output/predict.csv')
+    df1 = pd.read_csv('../Data/test A/output/predict1.csv')
+    df2 = pd.read_csv('../Data/test A/output/predict2.csv')
+    df3 = pd.read_csv('../Data/test A/output/predict3.csv')
+    
+    pieces = {'0': df, '1': df1, '2': df2, '3': df3}
+    result = pd.concat(pieces)
+    print(len(result))
+    result.to_csv('../Data/result.csv', index=False)
+    
