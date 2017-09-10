@@ -5,43 +5,68 @@
 --------------------------------
 Fold: 0
 ==> m0.model had been trained.
-| AUC (Train):	0.947986961883
-==> get positive samples: 312884
-==> get negative samples: 166076
----------  Modeling ------------
---------------------------------
-Fold: 0
-==> m0.model had been trained.
-| AUC (Train):	0.948122610072
-| AUC Score (test):	0.94856508328
-| Accuracy: 0.885263905128 | Precision: 0.884349282211 | Recall: 0.948424618138 | F1: 0.915266886026
---------------------------------
-| AUC Score (test):	0.948431242184
-| Accuracy: 0.886023885084 | Precision: 0.885167435595 | Recall: 0.948700257457 | F1: 0.915833325624
+| AUC (Train):	0.948102295985
+| AUC Score (test):	0.949825218465
+| Accuracy: 0.883956906631 | Precision: 0.883886255924 | Recall: 0.945849650125 | F1: 0.913818768219
 --------------------------------
 Fold: 1
 ==> m1.model had been trained.
-| AUC (Train):	0.948597500505
-| AUC Score (test):	0.948315736517
-| Accuracy: 0.884858860865 | Precision: 0.883460280972 | Recall: 0.948801749886 | F1: 0.914965923459
+| AUC (Train):	0.948350834721
+| AUC Score (test):	0.94943374478
+| Accuracy: 0.888591949223 | Precision: 0.887567118574 | Recall: 0.950866041634 | F1: 0.918126860404
 --------------------------------
-Fold: 1
-==> m1.model had been trained.
-| AUC (Train):	0.948676627159
-| AUC Score (test):	0.948238816439
-| Accuracy: 0.884934023718 | Precision: 0.883647536591 | Recall: 0.94875139054 | F1: 0.915042916338
+Fold: 2
+==> m2.model had been trained.
+| AUC (Train):	0.948388670962
+| AUC Score (test):	0.949403951319
+| Accuracy: 0.886775513613 | Precision: 0.88564194221 | Recall: 0.949417212199 | F1: 0.916421360869
+--------------------------------
+Fold: 3
+==> m3.model had been trained.
+| AUC (Train):	0.948790035157
+| AUC Score (test):	0.948551810986
+| Accuracy: 0.885898613663 | Precision: 0.885196374622 | Recall: 0.947885970532 | F1: 0.915469211613
+--------------------------------
+Fold: 4
+==> m4.model had been trained.
+| AUC (Train):	0.948777182724
+| AUC Score (test):	0.949069864873
+| Accuracy: 0.886295306497 | Precision: 0.885576436251 | Recall: 0.948817767 | F1: 0.916106969006
+--------------------------------
+Fold: 5
+==> m5.model had been trained.
+| AUC (Train):	0.948742093853
+| AUC Score (test):	0.948746083923
+| Accuracy: 0.886587606481 | Precision: 0.884846323049 | Recall: 0.950264955628 | F1: 0.916389607191
+--------------------------------
+Fold: 6
+==> m6.model had been trained.
+| AUC (Train):	0.948677331501
+| AUC Score (test):	0.948687285974
+| Accuracy: 0.886128277936 | Precision: 0.884626839002 | Recall: 0.949494949495 | F1: 0.915913786192
+--------------------------------
+Fold: 7
+==> m7.model had been trained.
+| AUC (Train):	0.949084116402
+| AUC Score (test):	0.947094241051
+| Accuracy: 0.884290963755 | Precision: 0.882794354118 | Recall: 0.948611288878 | F1: 0.914520159176
+--------------------------------
+Fold: 8
+==> m8.model had been trained.
+| AUC (Train):	0.948587973098
+| AUC Score (test):	0.948914328167
+| Accuracy: 0.88564807082 | Precision: 0.883470287007 | Recall: 0.949963184685 | F1: 0.91551099113
+--------------------------------
+Fold: 9
+==> m9.model had been trained.
+| AUC (Train):	0.948624969076
+| AUC Score (test):	0.946887204363
+| Accuracy: 0.88122181393 | Precision: 0.880917665962 | Recall: 0.946088457114 | F1: 0.912340714033
 --------------------------------
 ------------Finished-----------------
-Mean AUC: 0.94837348935
-Mean acc: 0.885441372975
-Mean pre: 0.884313858283
-Mean recall: 0.948751003672
-Mean F1: 0.915399624542
---------------------------------
-------------Finished-----------------
-Mean AUC: 0.94840194986
-Mean acc: 0.885098964423
-Mean pre: 0.883998409401
-Mean recall: 0.948588004339
-Mean F1: 0.915154901182
+Mean AUC: 0.94866137339
+Mean acc: 0.885539502255
+Mean pre: 0.884452359672
+Mean recall: 0.948725947729
+Mean F1: 0.915461842783
 --------------------------------
