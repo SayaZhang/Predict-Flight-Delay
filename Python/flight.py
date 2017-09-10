@@ -254,6 +254,7 @@ def load_test_data(test_data_path, label):
     # 出发机场天气
     weather_from = pd.read_csv('../Data/test A/output/weather_airport_vec.csv')
     weather_from.columns = [u'出发机场', u'出发机场天气', u'出发机场最低气温', u'出发机场最高气温', 'date', 'weatherVecFrom']
+    weather_from = weather_from.drop_duplicates([u'出发机场', 'date'])
     weather_from['weatherVecFrom'] = weather_from['weatherVecFrom'].apply(
         lambda x: [float(i) for i in x[1:-1].split(', ')])
     weather_from['weatherVecFrom0'] = weather_from['weatherVecFrom'].apply(lambda x: x[0])
@@ -263,6 +264,7 @@ def load_test_data(test_data_path, label):
     # 到达机场天气
     weather_to = pd.read_csv('../Data/test A/output/weather_airport_vec.csv')
     weather_to.columns = [u'到达机场', u'到达机场天气', u'到达机场最低气温', u'到达机场最高气温', 'date', 'weatherVecTo']
+    weather_to = weather_to.drop_duplicates([u'到达机场', 'date'])
     weather_to['weatherVecTo'] = weather_to['weatherVecTo'].apply(lambda x: [float(i) for i in x[1:-1].split(', ')])
     weather_to['weatherVecTo0'] = weather_to['weatherVecTo'].apply(lambda x: x[0])
     weather_to['weatherVecTo1'] = weather_to['weatherVecTo'].apply(lambda x: x[1])
@@ -288,16 +290,15 @@ def load_test_data(test_data_path, label):
     elif label == 'no_lastflight_has_weather' or label == 'has_lastflight_has_weather':
         # 添加天气特征
         data_from = pd.merge(df, weather_from, on=[u'出发机场', 'date'], how='inner')
-        print(data_from.shape)
         data = pd.merge(data_from, weather_to, on=[u'到达机场', 'date'], how='inner')
-        print(data.shape)
         print('Extract weather feature success')
         # 添加特情
         data['hasSpecialNews'] = 0
         for index, row in sn.iterrows():
             # print data.ix[0,u'计划起飞时间'] - row[u'结束时间']
-            data[((data[u'出发机场'] == row[u'特情机场']) | (data[u'到达机场'] == row[u'特情机场'])) & (
-                (data[u'计划起飞时间'] > row[u'开始时间']) & (data[u'计划起飞时间'] < row[u'结束时间']))]['hasSpecialNews'] = 1
+            data.loc[((data.loc[:, u'出发机场'] == row[u'特情机场']) | (data.loc[:, u'到达机场'] == row[u'特情机场'])) & (
+                (data.loc[:, u'计划起飞时间'] > row[u'开始时间']) & (data.loc[:, u'计划起飞时间'] < row[u'结束时间'])), [
+                         'hasSpecialNews']] = 1
             # break
         print('Extract special news feature success')
 
@@ -364,7 +365,7 @@ def classify_test_data():
     test_data = pd.read_csv('../Data/test A/output/data_feature.csv', encoding='gbk')
 
     # 首先对飞机编号进行填充,统一填充成0
-    test_data.fillna({u'飞机编号': 0})
+    test_data = test_data.fillna({u'飞机编号': 0})
 
     # 获得列名
     cols = test_data.columns.values.tolist()
@@ -655,15 +656,16 @@ def load_sample_data_with_feature():
 
 
 if __name__ == '__main__':
+    classify_test_data()
     no_lastflight_no_weather = load_test_data('../Data/test A/output/no_lastflight_no_weather.csv',
                                               'no_lastflight_no_weather')
     print(no_lastflight_no_weather.shape)
     no_lastflight_has_weather = load_test_data('../Data/test A/output/no_lastflight_has_weather.csv',
-                                               'no_lastflight_no_weather')
+                                               'no_lastflight_has_weather')
     print(no_lastflight_has_weather.shape)
     has_lastflight_no_weather = load_test_data('../Data/test A/output/has_lastflight_no_weather.csv',
-                                               'no_lastflight_no_weather')
+                                               'has_lastflight_no_weather')
     print(has_lastflight_no_weather.shape)
     has_lastflight_has_weather = load_test_data('../Data/test A/output/has_lastflight_has_weather.csv',
-                                                'no_lastflight_no_weather')
+                                                'has_lastflight_has_weather')
     print(has_lastflight_has_weather.shape)
