@@ -31,8 +31,8 @@ def train_model(trainX, trainY):
     # m = LogisticRegression(penalty='l2',C=1000.0, random_state=0)
 
     # 随机森林
-    m = RandomForestRegressor(min_samples_split=210, min_samples_leaf=20, max_depth=25, random_state=10)
-    # m = RandomForestRegressor()
+    # m = RandomForestRegressor(min_samples_split=210, min_samples_leaf=20, max_depth=25, random_state=10)
+    m = RandomForestRegressor()
 
     # SVM
     # m = svm.SVC(kernel='rbf')
@@ -290,11 +290,15 @@ def model_cmd(op=0):
 
 if __name__ == '__main__':
     
-    # model_cmd()
+    '''
+    model_cmd()
     
-    # model_cmd(1)
+    model_cmd(1)
     
-    # model_cmd(2)
+    model_cmd(2)
     
-    # model_cmd(3)
+    model_cmd(3)
+    
     flight.concat_predict_data()
+    '''
+    flight.classify_train_data()

@@ -353,6 +353,7 @@ def extract_avg_delay():
 
 
 def classify_test_data():
+    
     weather = pd.read_csv('../Data/test A/output/weather_airport_vec.csv', encoding='gbk')
     print(weather.head())
 
@@ -415,6 +416,76 @@ def classify_test_data():
                                          encoding='gbk')
 
     print("===> classify test data finished.")
+
+
+def classify_train_data():
+    
+    weather = pd.read_csv('../Data/train/output/weather_airport_vec.csv')
+    print(weather.head())
+
+    # 构建天气集合用于查询
+    weather_set = set()
+    for index, value in weather.iterrows():
+        key_from = str(value['城市']) + "||" + str(value['日期'])
+        weather_set.add(key_from)
+
+    data = pd.read_csv('../Feature/data_with_last_flight_feature.csv', encoding='gbk')
+    print(data.head())
+
+    # 首先对飞机编号进行填充,统一填充成0
+    data = data.fillna({u'飞机编号': 0})
+
+    # 获得列名
+    cols = data.columns.values.tolist()
+
+    # 缺少前序航班没天气的
+    no_lastflight_no_weather = []
+    # 缺少前序航班有天气的
+    no_lastflight_has_weather = []
+    # 有前序航班和无天气的
+    has_lastflight_no_weather = []
+    # 啥都有
+    has_lastflight_has_weather = []
+    
+    num = len(data)
+    for index, value in data.iterrows():
+        print(index,'/',num)
+        # 没有前序航班的
+        if pd.isnull(value[u'lastFlight']):
+
+            # 没有前序航班没有天气向量
+            key_from = str(value[u'出发机场']) + "||" + str(value[u'date'])
+            key_to = str(value[u'到达机场']) + "||" + str(value[u'date'])
+            if (key_from not in weather_set) or (key_to not in weather_set):
+                no_lastflight_no_weather.append(value)
+            else:
+                no_lastflight_has_weather.append(value)
+        # 有前序航班
+        else:
+
+            key_from = str(value[u'出发机场']) + "||" + str(value[u'date'])
+            key_to = str(value[u'到达机场']) + "||" + str(value[u'date'])
+            # 有前序航班没天气的
+            if (key_from not in weather_set) or (key_to not in weather_set):
+                has_lastflight_no_weather.append(value)
+            # 有前序航班有天气的
+            else:
+                has_lastflight_has_weather.append(value)
+
+    no_lastflight_no_weather_df = pd.DataFrame(no_lastflight_no_weather, columns=cols)
+    no_lastflight_no_weather_df.to_csv('../Data/train/output/no_lastflight_no_weather.csv', index=False,
+                                       encoding='gbk')
+    no_lastflight_has_weather_df = pd.DataFrame(no_lastflight_has_weather, columns=cols)
+    no_lastflight_has_weather_df.to_csv('../Data/train/output/no_lastflight_has_weather.csv', index=False,
+                                        encoding='gbk')
+    has_lastflight_no_weather_df = pd.DataFrame(has_lastflight_no_weather, columns=cols)
+    has_lastflight_no_weather_df.to_csv('../Data/train/output/has_lastflight_no_weather.csv', index=False,
+                                        encoding='gbk')
+    has_lastflight_has_weather_df = pd.DataFrame(has_lastflight_has_weather, columns=cols)
+    has_lastflight_has_weather_df.to_csv('../Data/train/output/has_lastflight_has_weather.csv', index=False,
+                                         encoding='gbk')
+
+    print("===> classify train data finished.")
 
 
 def extractBasicFeature(df):
