@@ -75,18 +75,6 @@ def evaluate(real_v, predict_v):
     confusion_matrix
     return [AUC, acc, pre, recall]
 
-    '''
-    false_positive_rate, true_positive_rate, thresholds = metrics.roc_curve(real_v, predict_v)
-    roc_auc = metrics.auc(false_positive_rate, true_positive_rate)
-
-
-
-    plt.title('Receiver Operating Characteristic')
-    plt.plot(false_positive_rate, true_positive_rate, 'b', label='AUC = %0.2f'% roc_auc)
-    plt.show()
-    '''
-
-
 def log(p, record):
     log_file = open(p, 'a')
     log_file.write(record + "\n")
@@ -103,7 +91,7 @@ def model_cmd(op=0):
     log_file.close()
 
     # 获取正负样本数据
-    data = flight.load_sample_data_with_feature()
+    data = flight.load_sample_data_with_feature('no_lastflight_no_weather')
 
     NUM = len(data)
     count_data_n = len(data[data['isMoreThan3'] == 1])
@@ -132,7 +120,7 @@ def model_cmd(op=0):
         u'hasSpecialNews'
     ]
     
-    test_data = flight.load_test_data('../Data/test A/output/no_lastflight_no_weather.csv',
+    test_data = flight.load_test_data('../Data/test B/output/no_lastflight_no_weather.csv',
                                               'no_lastflight_no_weather')
     
     # 基础特征 + 前序航班 
@@ -144,8 +132,9 @@ def model_cmd(op=0):
             u'timePrepareThisFlightPlan'
         ])
         
-        test_data = flight.load_test_data('../Data/test A/output/has_lastflight_no_weather.csv',
+        test_data = flight.load_test_data('../Data/test B/output/has_lastflight_no_weather.csv',
                                                'has_lastflight_no_weather')
+        data = flight.load_sample_data_with_feature('has_lastflight_no_weather')
     
     # 基础特征 + 天气
     if op == 2:
@@ -162,8 +151,9 @@ def model_cmd(op=0):
             u'weatherVecTo2'
         ])
         
-        test_data = flight.load_test_data('../Data/test A/output/no_lastflight_has_weather.csv',
+        test_data = flight.load_test_data('../Data/test B/output/no_lastflight_has_weather.csv',
                                                'no_lastflight_has_weather')
+        data = flight.load_sample_data_with_feature('no_lastflight_has_weather')
         
     # 基础特征 + 前序航班 + 天气
     if op == 3:
@@ -184,8 +174,9 @@ def model_cmd(op=0):
             u'weatherVecTo2'
         ])
         
-        test_data = flight.load_test_data('../Data/test A/output/has_lastflight_has_weather.csv',
+        test_data = flight.load_test_data('../Data/test B/output/has_lastflight_has_weather.csv',
                                                 'has_lastflight_has_weather')
+        data = flight.load_sample_data_with_feature('has_lastflight_has_weather')
         
     Label = ['isMoreThan3']
 
@@ -301,4 +292,14 @@ if __name__ == '__main__':
     
     flight.concat_predict_data()
     '''
+    '''
     flight.classify_train_data()
+
+    flight.load_data_with_feature('../Data/train/output/no_lastflight_no_weather.csv','no_lastflight_no_weather')
+    flight.load_data_with_feature('../Data/train/output/no_lastflight_has_weather.csv','no_lastflight_has_weather')
+    flight.load_data_with_feature('../Data/train/output/has_lastflight_no_weather.csv','has_lastflight_no_weather')
+    flight.load_data_with_feature('../Data/train/output/has_lastflight_has_weather.csv','has_lastflight_has_weather')
+    '''
+    
+    flight.classify_test_data()
+

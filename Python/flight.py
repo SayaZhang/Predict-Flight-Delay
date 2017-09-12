@@ -7,6 +7,7 @@ from gensim.models import word2vec
 
 
 def load_airport_city():
+
     # 将机场城市表转为字典
     airport_city = {}
     df = pd.read_excel('../Data/train/airport_city.xlsx')
@@ -22,13 +23,14 @@ def load_airport_city():
 
 
 def load_test_airport_city():
+
     # 将机场城市表转为字典
     airport_city = {}
-    df = pd.read_excel('../Data/test A/airport_city.xlsx')
+    df = pd.read_excel('../Data/test B/airport_city.xlsx')
     for index, row in df.iterrows():
         airport_city[row[u'城市名称']] = row[u'机场编码']
     '''
-    fl=open('../Data/test A/airport_city.json', 'w')
+    fl=open('../Data/test B/airport_city.json', 'w')
     fl.write(json.dumps(airport_city))
     fl.close()
     '''
@@ -37,6 +39,7 @@ def load_test_airport_city():
 
 
 def load_weather():
+
     # 获取天气数据
     df = pd.read_csv('../Data/train/weather.csv')
     del df['Unnamed: 5']
@@ -77,11 +80,15 @@ def load_weather():
 
 
 def load_test_weather():
+
     # 获取天气数据
-    df = pd.read_excel('../Data/test A/weather.xlsx')
+    df = pd.read_excel('../Data/test B/weather.xlsx')
     df = df.dropna()
 
     airport_city_dict = load_test_airport_city()
+
+    print(airport_city_dict.keys()[0],type(airport_city_dict.keys()[0]))
+    print(df[u'城市'][0],type(df[u'城市'][0]))
 
     # 在天气数据中，保留城市机场表中的城市
     df = df[df[u'城市'].isin(airport_city_dict.keys())]
@@ -97,26 +104,27 @@ def load_test_weather():
 
     # 语料写入文件
 
-    fsock = open("../Data/test A/output/weather_word.txt", "w")
+    fsock = open("../Data/test B/output/weather_word.txt", "w")
     fsock.write(words.encode('utf-8'))
     fsock.close()
 
     # 读取语料
-    sentences = word2vec.LineSentence("../Data/test A/output/weather_word.txt")
+    sentences = word2vec.LineSentence("../Data/test B/output/weather_word.txt")
     model = word2vec.Word2Vec(sentences, min_count=1, size=3)
 
     # 存储模型
     '''
-    model.save('../Data/test A/output/weather_word_model.txt')  
-    model = word2vec.Word2Vec.load('../Data/test A/output/weather_word_model.txt') 
+    model.save('../Data/test B/output/weather_word_model.txt')  
+    model = word2vec.Word2Vec.load('../Data/test B/output/weather_word_model.txt') 
     '''
 
     # 添加天气向量    
     df['weatherVec'] = df[u'天气'].apply(lambda x: list(model[x]))
-    df.to_csv('../Data/test A/output/weather_airport_vec.csv', index=False, encoding='gbk')
+    df.to_csv('../Data/test B/output/weather_airport_vec.csv', index=False, encoding='gbk')
 
 
 def string2timestamp(strValue):
+
     try:
         d = datetime.datetime.strptime(strValue, "%Y-%m-%d %H:%M:%S")
         t = d.timetuple()
@@ -129,6 +137,7 @@ def string2timestamp(strValue):
 
 
 def load_special_news():
+
     # 获取机场特情数据
     df = pd.read_excel('../Data/train/special_news.xlsx')
 
@@ -144,8 +153,9 @@ def load_special_news():
 
 
 def load_test_special_news():
+
     # 获取机场特情数据
-    df = pd.read_excel('../Data/test A/special_news.xlsx')
+    df = pd.read_excel('../Data/test B/special_news.xlsx')
 
     # 缺失值
     df = df.dropna()
@@ -159,6 +169,7 @@ def load_test_special_news():
 
 
 def load_data():
+
     # 获取数据
     reader = pd.read_csv('../Data/train/flight_information.csv', iterator=True, encoding="gbk")
     loop = True
@@ -236,23 +247,12 @@ def load_data():
 
 
 def load_test_data(test_data_path, label):
-    # 获取数据
-    '''
-    df = pd.read_csv('../Data/test A/flight_information.csv',encoding="gbk")
 
-    df = extractBasicFeature(df)
-    df = extractFlightFeature(df)        
-    df = extractLastFlightFeature(df)
-    df = extractNeedSubmitData(df)
-
-    df.to_csv('../Data/test A/output/data_feature.csv',index=False,encoding='gbk')
-    '''
-    #    df = pd.read_csv('../Data/test A/output/data_feature.csv', encoding="gbk")
     df = pd.read_csv(test_data_path, encoding='gbk')
     load_test_weather()
 
     # 出发机场天气
-    weather_from = pd.read_csv('../Data/test A/output/weather_airport_vec.csv')
+    weather_from = pd.read_csv('../Data/test B/output/weather_airport_vec.csv')
     weather_from.columns = [u'出发机场', u'出发机场天气', u'出发机场最低气温', u'出发机场最高气温', 'date', 'weatherVecFrom']
     weather_from = weather_from.drop_duplicates([u'出发机场', 'date'])
     weather_from['weatherVecFrom'] = weather_from['weatherVecFrom'].apply(
@@ -262,7 +262,7 @@ def load_test_data(test_data_path, label):
     weather_from['weatherVecFrom2'] = weather_from['weatherVecFrom'].apply(lambda x: x[2])
 
     # 到达机场天气
-    weather_to = pd.read_csv('../Data/test A/output/weather_airport_vec.csv')
+    weather_to = pd.read_csv('../Data/test B/output/weather_airport_vec.csv')
     weather_to.columns = [u'到达机场', u'到达机场天气', u'到达机场最低气温', u'到达机场最高气温', 'date', 'weatherVecTo']
     weather_to = weather_to.drop_duplicates([u'到达机场', 'date'])
     weather_to['weatherVecTo'] = weather_to['weatherVecTo'].apply(lambda x: [float(i) for i in x[1:-1].split(', ')])
@@ -305,32 +305,9 @@ def load_test_data(test_data_path, label):
         print('Load ' + label + ' data with feature success')
         return data
 
-        # # 添加天气特征
-        # data_from = pd.merge(df, weather_from, on=[u'出发机场', 'date'], how='inner')
-        # print(data_from.shape)
-        # data = pd.merge(data_from, weather_to, on=[u'到达机场', 'date'], how='inner')
-        # print(data.shape)
-        # print('Extract weather feature success')
-        #
-        # # 添加特情
-        # data['hasSpecialNews'] = 0
-        # for index, row in sn.iterrows():
-        #     # print data.ix[0,u'计划起飞时间'] - row[u'结束时间']
-        #     data[((data[u'出发机场'] == row[u'特情机场']) | (data[u'到达机场'] == row[u'特情机场'])) & (
-        #         (data[u'计划起飞时间'] > row[u'开始时间']) & (data[u'计划起飞时间'] < row[u'结束时间']))]['hasSpecialNews'] = 1
-        #     # break
-        # print('Extract special news feature success')
-        #
-        # # 缺失值
-        # data = data.dropna()
-        #
-        # # print data[data['hasSpecialNews'] == True]
-        # # print data[data['timePrepareThisFlightPlan'] != 0].head()
-        # print('Load test data with feature success')
-        # return data
-
 
 def extract_avg_delay():
+
     # 获取数据
     reader = pd.read_csv('../Data/train/flight_information.csv', encoding="gbk")
     # 缺失值
@@ -353,8 +330,10 @@ def extract_avg_delay():
 
 
 def classify_test_data():
+
+    load_test_weather()
     
-    weather = pd.read_csv('../Data/test A/output/weather_airport_vec.csv', encoding='gbk')
+    weather = pd.read_csv('../Data/test B/output/weather_airport_vec.csv', encoding='gbk')
     print(weather.head())
 
     # 构建天气集合用于查询
@@ -363,7 +342,7 @@ def classify_test_data():
         key_from = str(value[u'城市']) + "||" + str(value[u'日期'])
         weather_set.add(key_from)
 
-    test_data = pd.read_csv('../Data/test A/output/data_feature.csv', encoding='gbk')
+    test_data = pd.read_csv('../Data/test B/output/data_feature.csv', encoding='gbk')
 
     # 首先对飞机编号进行填充,统一填充成0
     test_data = test_data.fillna({u'飞机编号': 0})
@@ -403,16 +382,16 @@ def classify_test_data():
                 has_lastflight_has_weather.append(value)
 
     no_lastflight_no_weather_df = pd.DataFrame(no_lastflight_no_weather, columns=cols)
-    no_lastflight_no_weather_df.to_csv('../Data/test A/output/no_lastflight_no_weather.csv', index=False,
+    no_lastflight_no_weather_df.to_csv('../Data/test B/output/no_lastflight_no_weather.csv', index=False,
                                        encoding='gbk')
     no_lastflight_has_weather_df = pd.DataFrame(no_lastflight_has_weather, columns=cols)
-    no_lastflight_has_weather_df.to_csv('../Data/test A/output/no_lastflight_has_weather.csv', index=False,
+    no_lastflight_has_weather_df.to_csv('../Data/test B/output/no_lastflight_has_weather.csv', index=False,
                                         encoding='gbk')
     has_lastflight_no_weather_df = pd.DataFrame(has_lastflight_no_weather, columns=cols)
-    has_lastflight_no_weather_df.to_csv('../Data/test A/output/has_lastflight_no_weather.csv', index=False,
+    has_lastflight_no_weather_df.to_csv('../Data/test B/output/has_lastflight_no_weather.csv', index=False,
                                         encoding='gbk')
     has_lastflight_has_weather_df = pd.DataFrame(has_lastflight_has_weather, columns=cols)
-    has_lastflight_has_weather_df.to_csv('../Data/test A/output/has_lastflight_has_weather.csv', index=False,
+    has_lastflight_has_weather_df.to_csv('../Data/test B/output/has_lastflight_has_weather.csv', index=False,
                                          encoding='gbk')
 
     print("===> classify test data finished.")
@@ -489,6 +468,7 @@ def classify_train_data():
 
 
 def extractBasicFeature(df):
+
     # 加载平均延迟
     avg_delay = pd.read_csv('../Data/train/output/flight_avg_delay_time.csv', encoding='gbk')
 
@@ -538,6 +518,7 @@ def extractBasicFeature(df):
 
 
 def extractFlightFeature(df):
+
     # 添加本航班特征
     flight_feature = []
 
@@ -558,6 +539,7 @@ def extractFlightFeature(df):
 
 
 def extractLastFlightFeature(df):
+
     # 添加前序航班特征
     dfg_all = []
 
@@ -616,12 +598,14 @@ def extractLastFlightFeature(df):
 
 
 def extractNeedSubmitData(df):
+
     print("==> extract data which we should submit.")
     df = df[df[u'需验证标识（1为需提交结果、0不需要提交）'].isin(['1'])]
     return df
 
 
 def build_submission_result(predict_X, predict_Y):
+
     print("==>prepare for submission.")
     submission = pd.DataFrame(columns=[])
     submission.loc[:, 'Flightno'] = predict_X.loc[:, u'航班编号']
@@ -635,6 +619,7 @@ def build_submission_result(predict_X, predict_Y):
 
 
 def balanceSample(result):
+
     # 对正样本抽样
     # 负样本
     result_n = result[result['isMoreThan3'] == 1]
@@ -654,9 +639,10 @@ def balanceSample(result):
     return data
 
 
-def load_data_with_feature():
+def load_data_with_feature(path, label):
+
     # 获取数据
-    reader = pd.read_csv('../Feature/data_with_last_flight_feature.csv', iterator=True, encoding="gbk")
+    reader = pd.read_csv(path, iterator=True, encoding="gbk")
     loop = True
     chunkSize = 100000
     chunks = []
@@ -666,7 +652,7 @@ def load_data_with_feature():
             count += 1
             chunk = reader.get_chunk(chunkSize)
             chunks.append(chunk)
-            print(count * chunkSize, 'Load data with feature success')
+            print(count * chunkSize, 'Load ' + label + ' data success')
             # break
         except StopIteration:
             loop = False
@@ -696,40 +682,60 @@ def load_data_with_feature():
     # 机场特情
     sn = load_special_news()
     print('Load special news data success')
+    if label == 'no_lastflight_no_weather' or label == 'has_lastflight_no_weather':
 
-    # 添加天气特征
-    data_from = pd.merge(df, weather_from, on=[u'出发机场', 'date'], how='inner')
-    data = pd.merge(data_from, weather_to, on=[u'到达机场', 'date'], how='inner')
-    print('Extract weather feature success')
+        # 添加特情
+        df['hasSpecialNews'] = 0
+        for index, row in sn.iterrows():
+            df.loc[((df.loc[:, u'出发机场'] == row[u'特情机场']) | (df.loc[:, u'到达机场'] == row[u'特情机场'])) & (
+                (df.loc[:, u'计划起飞时间'] > row[u'开始时间']) & (df.loc[:, u'计划起飞时间'] < row[u'结束时间'])), ['hasSpecialNews']] = 1
+        print('Extract special news feature success')
 
-    # 添加特情
-    data['hasSpecialNews'] = 0
-    for index, row in sn.iterrows():
-        # print data.ix[0,u'计划起飞时间'] - row[u'结束时间']
-        data[((data[u'出发机场'] == row[u'特情机场']) | (data[u'到达机场'] == row[u'特情机场'])) & (
-            (data[u'计划起飞时间'] > row[u'开始时间']) & (data[u'计划起飞时间'] < row[u'结束时间']))]['hasSpecialNews'] = 1
-        # break
-    print('Extract special news feature success')
+        print('Load ' + label + ' data with feature success')
 
-    # 缺失值 
-    data = data.dropna()
-    data.to_csv('../Feature/sample_data_with_all_feature.csv', index=False, encoding='gbk')
-    # print data[data['hasSpecialNews'] == True]
-    # print data[data['timePrepareThisFlightPlan'] != 0].head()
-    print('Load data with all feature success')
+        df.to_csv('../Data/train/output/sample_' + label + '.csv', index=False, encoding='gbk')
+        print('======> Save ' + label + ' data with feature success')
 
-    return data
+        return df
+
+    elif label == 'no_lastflight_has_weather' or label == 'has_lastflight_has_weather':
+
+        # 添加天气特征
+        data_from = pd.merge(df, weather_from, on=[u'出发机场', 'date'], how='inner')
+        data = pd.merge(data_from, weather_to, on=[u'到达机场', 'date'], how='inner')
+        print('Extract weather feature success')
+
+        # 添加特情
+        data['hasSpecialNews'] = 0
+        for index, row in sn.iterrows():
+            data.loc[((data.loc[:, u'出发机场'] == row[u'特情机场']) | (data.loc[:, u'到达机场'] == row[u'特情机场'])) & (
+                (data.loc[:, u'计划起飞时间'] > row[u'开始时间']) & (data.loc[:, u'计划起飞时间'] < row[u'结束时间'])), [
+                         'hasSpecialNews']] = 1
+
+        print('Load ' + label + ' data with feature success')
+
+        data.to_csv('../Data/train/output/sample_' + label + '.csv', index=False, encoding='gbk')
+        print('======> Save ' + label + ' data with feature success')
+
+        return data
+
+    df.to_csv('../Data/train/output/sample_' + label + '.csv', index=False, encoding='gbk')
+    print('======> Save ' + label + ' data with feature success')
+
+    return df
 
 
-def load_sample_data_with_feature():
-    df = pd.read_csv('../Feature/sample_data_with_feature.csv', encoding='gbk')
+def load_sample_data_with_feature(label):
+
+    df = pd.read_csv('../Data/train/output/sample_' + label + '.csv', encoding='gbk')
     return df
 
 def concat_predict_data():
-    df = pd.read_csv('../Data/test A/output/predict.csv')
-    df1 = pd.read_csv('../Data/test A/output/predict1.csv')
-    df2 = pd.read_csv('../Data/test A/output/predict2.csv')
-    df3 = pd.read_csv('../Data/test A/output/predict3.csv')
+
+    df = pd.read_csv('../Data/test B/output/predict.csv')
+    df1 = pd.read_csv('../Data/test B/output/predict1.csv')
+    df2 = pd.read_csv('../Data/test B/output/predict2.csv')
+    df3 = pd.read_csv('../Data/test B/output/predict3.csv')
     
     pieces = {'0': df, '1': df1, '2': df2, '3': df3}
     result = pd.concat(pieces)
