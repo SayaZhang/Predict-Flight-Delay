@@ -600,7 +600,7 @@ def extractLastFlightFeature(df):
 def extractNeedSubmitData(df):
 
     print("==> extract data which we should submit.")
-    df = df[df[u'需验证标识（1为需提交结果、0不需要提交）'].isin(['1'])]
+    df = df[df[u'验证标识（1：需要选手预测；0：提前两小时航班信息参考数据）'].isin(['1'])]
     return df
 
 
@@ -741,4 +741,13 @@ def concat_predict_data():
     result = pd.concat(pieces)
     print(len(result))
     result.to_csv('../Data/result.csv', index=False)
+
+
+if __name__ == '__main__':
+    df = pd.read_csv('../Data/test B/flight_information.csv',encoding='gbk')
+    df = extractBasicFeature(df)
+    df = extractFlightFeature(df)
+    df = extractLastFlightFeature(df)
+    df = extractNeedSubmitData(df)
+    df.to_csv('../Data/test B/output/data_feature.csv',index=False, encoding='gbk')
     
