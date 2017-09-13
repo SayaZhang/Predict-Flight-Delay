@@ -154,9 +154,9 @@ def load_test_special_news():
     df = df.dropna()
 
     # 转换为时间戳
-    df[u'收集时间'] = df[u'收集时间'].apply(lambda x: string2timestamp(x[:-1]))
-    df[u'开始时间'] = df[u'开始时间'].apply(lambda x: string2timestamp(x[:-1]))
-    df[u'结束时间'] = df[u'结束时间'].apply(lambda x: string2timestamp(x[:-1]))
+    df[u'收集时间'] = df[u'收集时间'].apply(lambda x: string2timestamp(str(x)))
+    df[u'开始时间'] = df[u'开始时间'].apply(lambda x: string2timestamp(str(x)))
+    df[u'结束时间'] = df[u'结束时间'].apply(lambda x: string2timestamp(str(x)))
 
     return df
 
@@ -239,8 +239,11 @@ def load_data():
 
 
 def load_test_data(test_data_path, label):
+
     df = pd.read_csv(test_data_path, encoding='gbk')
-    load_test_weather()
+    df['delayRatio'] = df['delay']/(3*3600)
+    print(1,len(df))
+    # load_test_weather()
 
     # 出发机场天气
     weather_from = pd.read_csv('../Data/test B/output/weather_airport_vec.csv')
@@ -265,6 +268,7 @@ def load_test_data(test_data_path, label):
     # 机场特情
     sn = load_test_special_news()
     print('Load special news data success')
+    
     if label == 'no_lastflight_no_weather' or label == 'has_lastflight_no_weather':
         # 添加特情
         df['hasSpecialNews'] = 0
@@ -276,6 +280,7 @@ def load_test_data(test_data_path, label):
         print('Extract special news feature success')
 
         print('Load ' + label + ' data with feature success')
+        print(2,len(df))
         return df
 
     elif label == 'no_lastflight_has_weather' or label == 'has_lastflight_has_weather':
@@ -292,6 +297,7 @@ def load_test_data(test_data_path, label):
                          'hasSpecialNews']] = 1
             # break
         print('Extract special news feature success')
+        print(3,len(data))
 
         print('Load ' + label + ' data with feature success')
         return data
@@ -371,17 +377,16 @@ def classify_test_data():
                 has_lastflight_has_weather.append(value)
 
     no_lastflight_no_weather_df = pd.DataFrame(no_lastflight_no_weather, columns=cols)
-    no_lastflight_no_weather_df.to_csv('../Data/test B/output/no_lastflight_no_weather.csv', index=False,
-                                       encoding='gbk')
+    no_lastflight_no_weather_df.to_csv('../Data/test B/output/no_lastflight_no_weather.csv', index=False,encoding='gbk')
+    
     no_lastflight_has_weather_df = pd.DataFrame(no_lastflight_has_weather, columns=cols)
-    no_lastflight_has_weather_df.to_csv('../Data/test B/output/no_lastflight_has_weather.csv', index=False,
-                                        encoding='gbk')
+    no_lastflight_has_weather_df.to_csv('../Data/test B/output/no_lastflight_has_weather.csv', index=False,encoding='gbk')
+    
     has_lastflight_no_weather_df = pd.DataFrame(has_lastflight_no_weather, columns=cols)
-    has_lastflight_no_weather_df.to_csv('../Data/test B/output/has_lastflight_no_weather.csv', index=False,
-                                        encoding='gbk')
+    has_lastflight_no_weather_df.to_csv('../Data/test B/output/has_lastflight_no_weather.csv', index=False,encoding='gbk')
+    
     has_lastflight_has_weather_df = pd.DataFrame(has_lastflight_has_weather, columns=cols)
-    has_lastflight_has_weather_df.to_csv('../Data/test B/output/has_lastflight_has_weather.csv', index=False,
-                                         encoding='gbk')
+    has_lastflight_has_weather_df.to_csv('../Data/test B/output/has_lastflight_has_weather.csv', index=False,encoding='gbk')
 
     print("===> classify test data finished.")
 
@@ -619,6 +624,7 @@ def balanceSample(result):
 
 
 def load_data_with_feature(path, label):
+
     # 获取数据
     reader = pd.read_csv(path, iterator=True, encoding="gbk")
     loop = True
@@ -704,7 +710,13 @@ def load_data_with_feature(path, label):
 
 
 def load_sample_data_with_feature(label):
-    df = pd.read_csv('../Data/train/output/sample_' + label + '.csv', encoding='gbk')
+    df = pd.read_csv('../Data/train/output/ratio_sample_' + label + '.csv', encoding='gbk')
+    '''
+    # 添加特征：延误时间/三小时
+    df['delayRatio'] = df['delay']/(3*3600)
+    df.to_csv('../Data/train/output/ratio_sample_' + label + '.csv', index=False, encoding='gbk')
+    print(label,'Add delay ratio success')
+    '''
     return df
 
 
@@ -719,8 +731,9 @@ def concat_predict_data():
     print(len(result))
     result.to_csv('../Data/result.csv', index=False)
 
-
+'''
 if __name__ == '__main__':
+    
     df = pd.read_csv('../Data/test B/flight_information.csv', encoding='gbk')
     print(df.shape)
     df = extractBasicFeature(df)
@@ -732,3 +745,5 @@ if __name__ == '__main__':
     df = extractNeedSubmitData(df)
     print(df.shape)
     df.to_csv('../Data/test B/output/data_feature.csv', index=False, encoding='gbk')
+
+'''

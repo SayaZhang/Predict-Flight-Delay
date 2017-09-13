@@ -2,12 +2,13 @@
 
 from __future__ import print_function
 import pandas as pd
+import numpy
 import os
 from sklearn.externals import joblib
 
 # 模型
 from sklearn.tree import DecisionTreeRegressor
-from sklearn.ensemble import RandomForestRegressor
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import Imputer
 from sklearn import svm
 from sklearn.linear_model import LogisticRegression
@@ -32,7 +33,7 @@ def train_model(trainX, trainY):
 
     # 随机森林
     # m = RandomForestRegressor(min_samples_split=210, min_samples_leaf=20, max_depth=25, random_state=10)
-    m = RandomForestRegressor()
+    m = RandomForestClassifier()
 
     # SVM
     # m = svm.SVC(kernel='rbf')
@@ -88,18 +89,7 @@ def model_cmd(op=0):
     print("==> Modeling start ")
     log_file = open(res_path, 'w')
     log_file.write("--> start\n")
-    log_file.close()
-
-    # 获取正负样本数据
-    data = flight.load_sample_data_with_feature('no_lastflight_no_weather')
-
-    NUM = len(data)
-    count_data_n = len(data[data['isMoreThan3'] == 1])
-    print('正样本数量: %d' % (NUM - count_data_n))
-    print('负样本数量: %d' % count_data_n)
-    log(res_path, "==> get positive samples: " + str(NUM - count_data_n))
-    log(res_path, "==> get negative samples: " + str(count_data_n))
-    print("总数据： ", NUM)
+    log_file.close()    
 
     # 基础特征
     Feature = [
@@ -119,9 +109,13 @@ def model_cmd(op=0):
         # 特情
         u'hasSpecialNews'
     ]
+    Label = ['isMoreThan3']
     
-    test_data = flight.load_test_data('../Data/test B/output/no_lastflight_no_weather.csv',
-                                              'no_lastflight_no_weather')
+    # 基础特征
+    if op == 0:
+        # 获取正负样本数据
+        data = flight.load_sample_data_with_feature('no_lastflight_no_weather')
+        test_data = flight.load_test_data('../Data/test B/output/no_lastflight_no_weather.csv','no_lastflight_no_weather')
     
     # 基础特征 + 前序航班 
     if op == 1:
@@ -132,8 +126,7 @@ def model_cmd(op=0):
             u'timePrepareThisFlightPlan'
         ])
         
-        test_data = flight.load_test_data('../Data/test B/output/has_lastflight_no_weather.csv',
-                                               'has_lastflight_no_weather')
+        test_data = flight.load_test_data('../Data/test B/output/has_lastflight_no_weather.csv','has_lastflight_no_weather')
         data = flight.load_sample_data_with_feature('has_lastflight_no_weather')
     
     # 基础特征 + 天气
@@ -151,8 +144,7 @@ def model_cmd(op=0):
             u'weatherVecTo2'
         ])
         
-        test_data = flight.load_test_data('../Data/test B/output/no_lastflight_has_weather.csv',
-                                               'no_lastflight_has_weather')
+        test_data = flight.load_test_data('../Data/test B/output/no_lastflight_has_weather.csv','no_lastflight_has_weather')
         data = flight.load_sample_data_with_feature('no_lastflight_has_weather')
         
     # 基础特征 + 前序航班 + 天气
@@ -174,11 +166,22 @@ def model_cmd(op=0):
             u'weatherVecTo2'
         ])
         
-        test_data = flight.load_test_data('../Data/test B/output/has_lastflight_has_weather.csv',
-                                                'has_lastflight_has_weather')
+        test_data = flight.load_test_data('../Data/test B/output/has_lastflight_has_weather.csv','no_lastflight_has_weather')
         data = flight.load_sample_data_with_feature('has_lastflight_has_weather')
+    
+    df = test_data.ix[:,Feature]
+    print(df.head())
+    #print(df[df.isnull().values==True])
         
-    Label = ['isMoreThan3']
+    print(data['delayRatio'].head())
+        
+    NUM = len(data)
+    count_data_n = len(data[data['isMoreThan3'] == 1])
+    print('正样本数量: %d' % (NUM - count_data_n))
+    print('负样本数量: %d' % count_data_n)
+    log(res_path, "==> get positive samples: " + str(NUM - count_data_n))
+    log(res_path, "==> get negative samples: " + str(count_data_n))
+    print("总数据： ", NUM)
 
     skf = KFold(NUM, n_folds=10, shuffle=True)
     count = 0
@@ -280,18 +283,20 @@ def model_cmd(op=0):
 
 
 if __name__ == '__main__':
-    
-    '''
+
+
     model_cmd()
     
-    model_cmd(1)
+    # model_cmd(1)
     
-    model_cmd(2)
+    # model_cmd(2)
     
-    model_cmd(3)
+    # model_cmd(3)
     
-    flight.concat_predict_data()
-    '''
+    #flight.concat_predict_data()
+    
+    #flight.classify_test_data()
+
     '''
     flight.classify_train_data()
 
@@ -299,7 +304,12 @@ if __name__ == '__main__':
     flight.load_data_with_feature('../Data/train/output/no_lastflight_has_weather.csv','no_lastflight_has_weather')
     flight.load_data_with_feature('../Data/train/output/has_lastflight_no_weather.csv','has_lastflight_no_weather')
     flight.load_data_with_feature('../Data/train/output/has_lastflight_has_weather.csv','has_lastflight_has_weather')
+
+    flight.load_sample_data_with_feature('no_lastflight_no_weather')
+    flight.load_sample_data_with_feature('no_lastflight_has_weather')
+    flight.load_sample_data_with_feature('has_lastflight_no_weather')
+    flight.load_sample_data_with_feature('has_lastflight_has_weather')
+
     '''
-    
-    flight.classify_test_data()
+
 

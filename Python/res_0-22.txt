@@ -1,72 +1,11 @@
 --> start
-==> get positive samples: 312884
-==> get negative samples: 166076
+==> get positive samples: 14296
+==> get negative samples: 7148
 ---------  Modeling ------------
 --------------------------------
 Fold: 0
-==> 3m0.model has been training.
-| AUC (Train):	0.999757357782
-| AUC Score (test):	0.930774171653
-| Accuracy: 0.882453649574 | Precision: 0.880780905898 | Recall: 0.94798206278 | F1: 0.913146771158
---------------------------------
-Fold: 1
-==> 3m1.model has been training.
-| AUC (Train):	0.999767197003
-| AUC Score (test):	0.930859607386
-| Accuracy: 0.88122181393 | Precision: 0.880212507049 | Recall: 0.947205365698 | F1: 0.912480962417
---------------------------------
-Fold: 2
-==> 3m2.model has been training.
-| AUC (Train):	0.999762172979
-| AUC Score (test):	0.931141112379
-| Accuracy: 0.882620678136 | Precision: 0.882780945593 | Recall: 0.946656050955 | F1: 0.913603393164
---------------------------------
-Fold: 3
-==> 3m3.model has been training.
-| AUC (Train):	0.999741443911
-| AUC Score (test):	0.929814668513
-| Accuracy: 0.880637213964 | Precision: 0.880360104241 | Recall: 0.946600859736 | F1: 0.912279624998
---------------------------------
-Fold: 4
-==> 3m4.model has been training.
-| AUC (Train):	0.999758731281
-| AUC Score (test):	0.93139622477
-| Accuracy: 0.881785535327 | Precision: 0.87926322044 | Recall: 0.948772199782 | F1: 0.912696209948
---------------------------------
-Fold: 5
-==> 3m5.model has been training.
-| AUC (Train):	0.999746827768
-| AUC Score (test):	0.929630027861
-| Accuracy: 0.881326206781 | Precision: 0.88067251897 | Recall: 0.946464549554 | F1: 0.912384005919
---------------------------------
-Fold: 6
-==> 3m6.model has been training.
-| AUC (Train):	0.999757167513
-| AUC Score (test):	0.930972299666
-| Accuracy: 0.880574578253 | Precision: 0.878288789131 | Recall: 0.947832782572 | F1: 0.911736567602
---------------------------------
-Fold: 7
-==> 3m7.model has been training.
-| AUC (Train):	0.999766619724
-| AUC Score (test):	0.931765702902
-| Accuracy: 0.882432771004 | Precision: 0.880957329928 | Recall: 0.948162352189 | F1: 0.913325226654
---------------------------------
-Fold: 8
-==> 3m8.model has been training.
-| AUC (Train):	0.99976484803
-| AUC Score (test):	0.932714899076
-| Accuracy: 0.884416235176 | Precision: 0.883270799833 | Recall: 0.948334292474 | F1: 0.914646931853
---------------------------------
-Fold: 9
-==> 3m9.model has been training.
-| AUC (Train):	0.999767938325
-| AUC Score (test):	0.928201499108
-| Accuracy: 0.879551528311 | Precision: 0.877553430157 | Recall: 0.948291811541 | F1: 0.911552318896
---------------------------------
-------------Finished-----------------
-Mean AUC: 0.930727021332
-Mean acc: 0.881702021046
-Mean pre: 0.880414055124
-Mean recall: 0.947630232728
-Mean F1: 0.912785201261
+==> 0m0.model had been trained.
+| AUC (Train):	0.938348996478
+| AUC Score (test):	0.93617048386
+| Accuracy: 0.94965034965 | Precision: 0.949762389681 | Recall: 0.976273551989 | F1: 0.962835512732
 --------------------------------
